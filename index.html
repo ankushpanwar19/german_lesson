@@ -824,10 +824,10 @@
     <canvas id="physics-canvas"></canvas>
 
     <!-- Audio Elements -->
-    <audio id="bg-music" loop>
-        <source src="GehraHua.m4a" type="audio/mpeg">
+    <audio id="bg-music" loop preload="auto">
+        <source src="GehraHua.mp3" type="audio/mpeg">
     </audio>
-    <audio id="success-sound">
+    <audio id="success-sound" preload="auto">
         <source src="[SUCCESS_SOUND_URL]" type="audio/mpeg">
     </audio>
 
@@ -839,7 +839,8 @@
             physicsActive: false,
             neinAttempts: 0,
             audioMuted: false,
-            buttonScale: 1
+            buttonScale: 1,
+            audioUnlocked: false
         };
 
         // Quiz data - German vocabulary questions
@@ -932,6 +933,29 @@
             element.textContent = text;
         }
 
+        // Unlock audio for iOS (must be called on user interaction)
+        function unlockAudio() {
+            if (appState.audioUnlocked) return;
+            
+            const bgMusic = document.getElementById('bg-music');
+            
+            // Create a silent playback to unlock audio on iOS
+            bgMusic.volume = 0;
+            const playPromise = bgMusic.play();
+            
+            if (playPromise !== undefined) {
+                playPromise.then(() => {
+                    bgMusic.pause();
+                    bgMusic.currentTime = 0;
+                    bgMusic.volume = 0.5;
+                    appState.audioUnlocked = true;
+                    console.log('Audio unlocked for iOS');
+                }).catch(err => {
+                    console.log('Audio unlock failed:', err);
+                });
+            }
+        }
+
         // Phase 1: Quiz Logic
         function startQuiz() {
             const q = quizQuestions[appState.currentQuestion];
@@ -953,6 +977,9 @@
         }
 
         function answerQuestion(answer) {
+            // Unlock audio on first user interaction (iOS fix)
+            unlockAudio();
+            
             const currentQ = quizQuestions[appState.currentQuestion];
             
             if (answer === currentQ.correct) {
@@ -999,12 +1026,19 @@
             document.getElementById('floating-hearts').classList.add('show');
             
             // Start playing romantic background music
-            if (!appState.audioMuted) {
+            if (!appState.audioMuted && appState.audioUnlocked) {
                 const bgMusic = document.getElementById('bg-music');
                 bgMusic.volume = 0.5; // Set volume to 50%
-                bgMusic.play().catch(err => {
-                    console.log('Audio autoplay blocked, user needs to interact first');
-                });
+                bgMusic.currentTime = 0; // Start from beginning
+                
+                const playPromise = bgMusic.play();
+                if (playPromise !== undefined) {
+                    playPromise.catch(err => {
+                        console.log('Audio playback failed:', err);
+                        // Show a hint to user if audio fails
+                        console.log('Tap the screen if audio doesn\'t play');
+                    });
+                }
             }
             
             // Display the proposal question
@@ -1257,6 +1291,9 @@
 
         // Phase 3: Success with Enhanced Confetti
         function acceptProposal() {
+            // Ensure audio is unlocked (backup for iOS)
+            unlockAudio();
+            
             // Stop physics
             appState.physicsActive = false;
             if (runner) {
@@ -1328,6 +1365,11 @@
 
         // Audio controls
         function toggleAudio() {
+            // Unlock audio on first interaction (iOS fix)
+            if (!appState.audioUnlocked) {
+                unlockAudio();
+            }
+            
             appState.audioMuted = !appState.audioMuted;
             const bgMusic = document.getElementById('bg-music');
             const muteBtn = document.getElementById('mute-btn');
@@ -1336,6 +1378,7 @@
                 bgMusic.pause();
                 muteBtn.textContent = '🔇';
             } else {
+                bgMusic.volume = 0.5;
                 bgMusic.play().catch(() => {});
                 muteBtn.textContent = '🔊';
             }
