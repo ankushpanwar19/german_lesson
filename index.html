@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>German Vocabulary Practice - Level 1</title>
+    
+    <!-- CDN Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        /* 
+        ═══════════════════════════════════════════════════════════════════
+        PERSONALIZATION PLACEHOLDERS - REPLACE THESE IN THE HTML/JS BELOW:
+        ═══════════════════════════════════════════════════════════════════
+        
+        [YOUR_NAME] - Your name (appears in messages)
+        [WIFE_NAME] - Your wife's name (used in proposal)
+        
+        DATE DETAILS (in Phase 3 HTML):
+        [RESTAURANT_NAME] - Name of the Zurich restaurant
+        [DATE_TIME] - Date and time of reservation
+        [MAP_LINK] - Google Maps link to restaurant
+        
+        LOVE LETTER (in Phase 3 HTML):
+        [YOUR_LOVE_MESSAGE] - Your personal love letter text (can be multiple lines)
+        
+        AUDIO (optional, in JavaScript):
+        [BACKGROUND_MUSIC_URL] - URL to romantic background music MP3
+        [SUCCESS_SOUND_URL] - URL to success chime sound
+        
+        NOTE: Phase 1 uses German vocabulary questions (Das Herz, Für immer)
+              to maintain the surprise before the Valentine proposal!
+        
+        ═══════════════════════════════════════════════════════════════════
+        */
+        
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #FFE5E5 0%, #FFC0CB 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Floating Hearts Background */
+        .floating-hearts {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 1s ease-in;
+        }
+
+        .floating-hearts.show {
+            opacity: 1;
+        }
+
+        .heart {
+            position: absolute;
+            bottom: -50px;
+            font-size: 35px;
+            color: rgba(255, 105, 180, 0.7);
+            animation: floatUp 15s infinite ease-in;
+        }
+
+        .heart:nth-child(2n) {
+            animation-duration: 12s;
+            font-size: 28px;
+            color: rgba(255, 20, 147, 0.6);
+        }
+
+        .heart:nth-child(3n) {
+            animation-duration: 18s;
+            font-size: 40px;
+            color: rgba(255, 182, 193, 0.6);
+        }
+
+        .heart:nth-child(4n) {
+            animation-duration: 16s;
+            font-size: 32px;
+            color: rgba(255, 105, 180, 0.65);
+        }
+
+        /* Flowers */
+        .flower {
+            position: absolute;
+            bottom: -50px;
+            font-size: 30px;
+            animation: floatUpFlower 14s infinite ease-in-out;
+        }
+
+        .flower:nth-child(2n) {
+            animation-duration: 17s;
+            font-size: 25px;
+        }
+
+        .flower:nth-child(3n) {
+            animation-duration: 13s;
+            font-size: 35px;
+        }
+
+        .flower:nth-child(5n) {
+            animation-duration: 19s;
+            font-size: 28px;
+        }
+
+        @keyframes floatUp {
+            0% {
+                bottom: -50px;
+                transform: translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                bottom: 110vh;
+                transform: translateX(calc(var(--drift) * 100px)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        @keyframes floatUpFlower {
+            0% {
+                bottom: -50px;
+                transform: translateX(0) rotate(0deg) scale(1);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            50% {
+                transform: translateX(calc(var(--drift) * 80px)) rotate(180deg) scale(1.1);
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                bottom: 110vh;
+                transform: translateX(calc(var(--drift) * 100px)) rotate(360deg) scale(0.9);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            position: relative;
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1;
+            padding: 20px 0;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            padding: 40px 50px;
+            max-width: 700px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            text-align: center;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Smooth scrolling */
+        .card::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .card::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .card::-webkit-scrollbar-thumb {
+            background: #FFB6C1;
+            border-radius: 10px;
+        }
+
+        .card::-webkit-scrollbar-thumb:hover {
+            background: #FF69B4;
+        }
+
+        h1 {
+            color: #FF1493;
+            margin-bottom: 20px;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .question {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 500;
+            min-height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .options {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 15px 40px;
+            font-size: 18px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            min-width: 150px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .option-btn {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .option-btn:hover {
+            background: #e0e0e0;
+        }
+
+        .ja-btn {
+            background: linear-gradient(135deg, #00C853 0%, #00E676 100%);
+            color: white;
+        }
+
+        .ja-btn:hover {
+            background: linear-gradient(135deg, #00E676 0%, #00C853 100%);
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 8px 25px rgba(0, 200, 83, 0.4);
+        }
+
+        .nein-btn {
+            background: linear-gradient(135deg, #FF1744 0%, #FF5252 100%);
+            color: white;
+            transition: transform 0.1s ease, box-shadow 0.1s ease;
+        }
+
+        .nein-btn.physics-active {
+            position: fixed;
+            pointer-events: none;
+        }
+
+        .nein-btn.shaking {
+            animation: shake 0.3s infinite;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px) rotate(-2deg); }
+            75% { transform: translateX(5px) rotate(2deg); }
+        }
+
+        /* Speech bubble for buttons */
+        .speech-bubble {
+            position: fixed;
+            background: white;
+            color: #FF1744;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(0) translateX(-50%);
+            transition: opacity 0.1s, background 0.1s;
+            white-space: nowrap;
+        }
+
+        .speech-bubble.show {
+            opacity: 1;
+            transform: translateY(0) translateX(-50%);
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid currentColor;
+            opacity: 0.3;
+        }
+
+        /* Hint message */
+        .hint-message {
+            margin-top: 20px;
+            font-size: 16px;
+            color: #FF1493;
+            font-style: italic;
+            min-height: 25px;
+            opacity: 0;
+            transition: opacity 0.5s;
+        }
+
+        .hint-message.show {
+            opacity: 1;
+        }
+
+        /* Phase visibility */
+        .phase {
+            display: none;
+        }
+
+        .phase.active {
+            display: block;
+        }
+
+        /* Loading animation */
+        .loading {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .loading.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #FFE5E5;
+            border-top: 5px solid #FF1493;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: #FF1493;
+            font-size: 18px;
+            font-weight: 500;
+        }
+
+        /* Fade animations */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Success phase */
+        .success-content {
+            max-width: 100%;
+        }
+
+        .success-image {
+            width: 100%;
+            max-width: 350px;
+            height: 250px;
+            border-radius: 15px;
+            margin: 15px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .success-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        .success-message {
+            font-size: 24px;
+            color: #FF1493;
+            font-weight: 700;
+            margin-top: 15px;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .date-details {
+            background: #FFF0F5;
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            text-align: left;
+        }
+
+        .date-details h3 {
+            color: #FF1493;
+            margin-bottom: 12px;
+            font-size: 20px;
+        }
+
+        .date-info {
+            margin: 8px 0;
+            font-size: 16px;
+            color: #333;
+            line-height: 1.4;
+        }
+
+        .date-info strong {
+            color: #FF1493;
+        }
+
+        .map-link {
+            display: inline-block;
+            margin-top: 12px;
+            padding: 10px 20px;
+            background: #FF1493;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .map-link:hover {
+            background: #FF69B4;
+        }
+
+        .calendar-btn {
+            display: inline-block;
+            margin-left: 8px;
+            margin-top: 12px;
+            padding: 10px 20px;
+            background: #00C853;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .calendar-btn:hover {
+            background: #00E676;
+        }
+
+        /* Love letter */
+        .love-letter-container {
+            margin-top: 25px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .love-letter-container.show {
+            display: block;
+            animation: unfold 1s ease-out;
+        }
+
+        @keyframes unfold {
+            0% {
+                opacity: 0;
+                transform: scaleY(0);
+            }
+            50% {
+                opacity: 0.5;
+                transform: scaleY(0.5);
+            }
+            100% {
+                opacity: 1;
+                transform: scaleY(1);
+            }
+        }
+
+        .love-letter {
+            background: #FFFAF0;
+            padding: 20px;
+            border-radius: 15px;
+            border: 2px solid #FFD700;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            font-family: 'Dancing Script', cursive;
+            font-size: 20px;
+            color: #8B4513;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .one-more-thing {
+            font-size: 18px;
+            color: #FF1493;
+            font-style: italic;
+            margin-top: 25px;
+            margin-bottom: 10px;
+            opacity: 0;
+            animation: fadeIn 0.5s ease-in 2s forwards;
+        }
+
+        /* Audio controls */
+        .audio-controls {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .mute-btn {
+            background: rgba(255, 255, 255, 0.9);
+            border: 2px solid #FF1493;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .mute-btn:hover {
+            background: #FF1493;
+            transform: scale(1.1);
+        }
+
+        /* Physics canvas */
+        #physics-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+            display: none;
+        }
+
+        #physics-canvas.active {
+            display: block;
+        }
+
+        /* Button container for phase 2 */
+        .button-container {
+            position: relative;
+            min-height: 80px;
+            margin-top: 20px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                overflow-x: hidden;
+            }
+
+            .container {
+                padding: 10px 0;
+            }
+
+            .card {
+                padding: 25px 20px;
+                width: 95%;
+                max-height: 95vh;
+            }
+            
+            h1 {
+                font-size: 22px;
+                margin-bottom: 15px;
+            }
+            
+            .question {
+                font-size: 18px;
+                min-height: 30px;
+                margin-bottom: 15px;
+            }
+            
+            button {
+                min-width: 110px;
+                padding: 12px 25px;
+                font-size: 15px;
+            }
+
+            .success-image {
+                max-width: 100%;
+                height: 200px;
+                margin: 10px auto;
+            }
+
+            .success-message {
+                font-size: 20px;
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+
+            .date-details {
+                padding: 15px;
+                margin-top: 15px;
+            }
+
+            .date-details h3 {
+                font-size: 18px;
+                margin-bottom: 10px;
+            }
+
+            .date-info {
+                font-size: 14px;
+                margin: 6px 0;
+            }
+
+            .map-link, .calendar-btn {
+                padding: 8px 15px;
+                font-size: 13px;
+                margin-top: 8px;
+                display: inline-block;
+            }
+
+            .calendar-btn {
+                margin-left: 5px;
+            }
+
+            .love-letter {
+                padding: 15px;
+                font-size: 18px;
+                line-height: 1.5;
+            }
+
+            .one-more-thing {
+                font-size: 16px;
+                margin-top: 15px;
+            }
+
+            .love-letter-container {
+                margin-top: 15px;
+                margin-bottom: 10px;
+            }
+
+            .hint-message {
+                font-size: 14px;
+            }
+
+            .speech-bubble {
+                font-size: 14px;
+                padding: 8px 15px;
+            }
+
+            .audio-controls {
+                top: 10px;
+                right: 10px;
+            }
+
+            .mute-btn {
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .card {
+                padding: 20px 15px;
+            }
+
+            h1 {
+                font-size: 20px;
+            }
+
+            .question {
+                font-size: 16px;
+            }
+
+            .options {
+                gap: 12px;
+            }
+
+            button {
+                min-width: 100px;
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .success-image {
+                height: 180px;
+            }
+
+            .success-message {
+                font-size: 18px;
+            }
+
+            .date-details h3 {
+                font-size: 16px;
+            }
+
+            .date-info {
+                font-size: 13px;
+            }
+
+            .love-letter {
+                font-size: 16px;
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating Hearts Background -->
+    <div class="floating-hearts" id="floating-hearts"></div>
+
+    <!-- Audio Controls -->
+    <div class="audio-controls">
+        <button class="mute-btn" id="mute-btn" title="Toggle Sound">🔊</button>
+    </div>
+
+    <div class="container">
+        <div class="card fade-in">
+            <!-- Phase 1: German Quiz -->
+            <div id="phase1" class="phase active">
+                <h1>German Vocabulary Practice: Level 1</h1>
+                <div class="question" id="question-text"></div>
+                <div class="options" id="options"></div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <div class="loading-text">Loading Next Level...</div>
+            </div>
+
+            <!-- Phase 2: Proposal -->
+            <div id="phase2" class="phase">
+                <h1>💕</h1>
+                <div class="question" id="proposal-question"></div>
+                <div class="hint-message" id="hint-message"></div>
+                <div class="button-container">
+                    <div class="options">
+                        <button class="ja-btn" onclick="acceptProposal()">Ja, natürlich!</button>
+                        <button class="nein-btn" id="nein-btn">Nein</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Phase 3: Success -->
+            <div id="phase3" class="phase">
+                <div class="success-content">
+                    <h1>🎉 Juhuu! 🎉</h1>
+                    <div class="success-image">
+                        <img src="IMG_9298.jpg" alt="Our Special Moment" />
+                    </div>
+                    <div class="success-message">Can't wait for this night, Bubu!</div>
+                    
+                    <div class="date-details">
+                        <h3>📅 Our Special Date</h3>
+                        <div class="date-info"><strong>Restaurant:</strong> [RESTAURANT_NAME]</div>
+                        <div class="date-info"><strong>Date & Time:</strong> [DATE_TIME]</div>
+                        <div class="date-info"><strong>Location:</strong> Zurich, Switzerland</div>
+                        <div>
+                            <a href="[MAP_LINK]" target="_blank" class="map-link">📍 View on Map</a>
+                            <button class="calendar-btn" onclick="addToCalendar()">📅 Add to Calendar</button>
+                        </div>
+                    </div>
+
+                    <div class="one-more-thing">One more thing...</div>
+                    
+                    <div class="love-letter-container" id="love-letter">
+                        <div class="love-letter">
+                            [YOUR_LOVE_MESSAGE]
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Speech Bubble for Nein Button -->
+    <div class="speech-bubble" id="speech-bubble"></div>
+
+    <!-- Physics Canvas -->
+    <canvas id="physics-canvas"></canvas>
+
+    <!-- Audio Elements -->
+    <audio id="bg-music" loop>
+        <source src="GehraHua.m4a" type="audio/mpeg">
+    </audio>
+    <audio id="success-sound">
+        <source src="[SUCCESS_SOUND_URL]" type="audio/mpeg">
+    </audio>
+
+    <script>
+        // Application State
+        const appState = {
+            currentPhase: 1,
+            currentQuestion: 1,
+            physicsActive: false,
+            neinAttempts: 0,
+            audioMuted: false,
+            buttonScale: 1
+        };
+
+        // Quiz data - German vocabulary questions
+        const quizQuestions = {
+            1: {
+                question: "What is 'Das Herz'?",
+                options: ["The House", "The Heart"],
+                correct: "The Heart"
+            },
+            2: {
+                question: "What is 'Für immer'?",
+                options: ["Forever", "Never"],
+                correct: "Forever"
+            }
+        };
+
+        // Cheeky messages for Nein button
+        const cheekyMessages = [
+            "You sure? 😏",
+            "Really? 🤔",
+            "Think again! 💭",
+            "Nope! 😜",
+            "Not today! 🙈",
+            "Try the green one! 💚",
+            "Wrong button! ❌",
+            "Are you testing me? 😅"
+        ];
+
+        // Cheeky messages for Ja button
+        const jaMessages = [
+            "Yes! This one! 💚",
+            "Perfect choice! 😊",
+            "You know you want to! 💕",
+            "The right button! ✨",
+            "Smart decision! 🥰",
+            "I knew it! 💖",
+            "Go ahead, click me! 😉"
+        ];
+
+        const hintMessages = [
+            "",
+            "",
+            "",
+            "",
+            "",
+            "The heart wants what it wants... 💕",
+            "The heart wants what it wants... 💕",
+            "The heart wants what it wants... 💕",
+            "The heart wants what it wants... 💕",
+            "The heart wants what it wants... 💕",
+            "Just click the green one! You know you want to! 😊"
+        ];
+
+        let lastJaMessageTime = 0;
+        let jaMessageShowing = false;
+        let currentJaMessage = '';
+        let jaBubbleTimeout = null;
+
+        // Initialize floating hearts and flowers
+        function createFloatingHearts() {
+            const heartsContainer = document.getElementById('floating-hearts');
+            const hearts = ['💕', '💖', '💗', '💝', '❤️'];
+            const flowers = ['🌸', '🌺', '🌹', '🌷', '💐', '🌼'];
+            
+            // Create hearts
+            for (let i = 0; i < 12; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.setProperty('--drift', (Math.random() - 0.5) * 2);
+                heart.style.animationDelay = Math.random() * 15 + 's';
+                heartsContainer.appendChild(heart);
+            }
+            
+            // Create flowers
+            for (let i = 0; i < 10; i++) {
+                const flower = document.createElement('div');
+                flower.className = 'flower';
+                flower.textContent = flowers[Math.floor(Math.random() * flowers.length)];
+                flower.style.left = Math.random() * 100 + '%';
+                flower.style.setProperty('--drift', (Math.random() - 0.5) * 2);
+                flower.style.animationDelay = Math.random() * 15 + 's';
+                heartsContainer.appendChild(flower);
+            }
+        }
+
+        // Display text directly (no typewriter effect)
+        function displayText(element, text) {
+            element.textContent = text;
+        }
+
+        // Phase 1: Quiz Logic
+        function startQuiz() {
+            const q = quizQuestions[appState.currentQuestion];
+            const questionEl = document.getElementById('question-text');
+            
+            displayText(questionEl, q.question);
+            
+            // Show options
+            const optionsContainer = document.getElementById('options');
+            optionsContainer.innerHTML = '';
+            
+            q.options.forEach(option => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = option;
+                btn.onclick = () => answerQuestion(option);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function answerQuestion(answer) {
+            const currentQ = quizQuestions[appState.currentQuestion];
+            
+            if (answer === currentQ.correct) {
+                if (appState.currentQuestion === 1) {
+                    // Move to question 2
+                    appState.currentQuestion = 2;
+                    startQuiz();
+                } else if (appState.currentQuestion === 2) {
+                    // Transition to Phase 2
+                    showLoading();
+                    setTimeout(() => {
+                        hideLoading();
+                        transitionToPhase2();
+                    }, 1500);
+                }
+            } else {
+                // Wrong answer - shake effect
+                const card = document.querySelector('.card');
+                card.style.animation = 'shake 0.5s';
+                setTimeout(() => {
+                    card.style.animation = '';
+                }, 500);
+            }
+        }
+
+        function showLoading() {
+            document.getElementById('phase1').classList.remove('active');
+            document.getElementById('loading').classList.add('active');
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').classList.remove('active');
+        }
+
+        // Phase 2: Proposal with Enhanced Physics
+        let engine, world, neinBody, runner, mousePosition = { x: 0, y: 0 };
+        let lastMessageTime = 0;
+        
+        function transitionToPhase2() {
+            appState.currentPhase = 2;
+            document.getElementById('phase2').classList.add('active');
+            
+            // Show floating hearts for romantic effect
+            document.getElementById('floating-hearts').classList.add('show');
+            
+            // Start playing romantic background music
+            if (!appState.audioMuted) {
+                const bgMusic = document.getElementById('bg-music');
+                bgMusic.volume = 0.5; // Set volume to 50%
+                bgMusic.play().catch(err => {
+                    console.log('Audio autoplay blocked, user needs to interact first');
+                });
+            }
+            
+            // Display the proposal question
+            const proposalText = "Willst du mein Valentin sein, Neha?";
+            displayText(document.getElementById('proposal-question'), proposalText);
+            
+            // Initialize physics
+            setTimeout(() => {
+                initializePhysics();
+            }, 100);
+        }
+
+        function initializePhysics() {
+            const canvas = document.getElementById('physics-canvas');
+            canvas.classList.add('active');
+            
+            // Setup Matter.js
+            const Engine = Matter.Engine;
+            const World = Matter.World;
+            const Bodies = Matter.Bodies;
+            const Runner = Matter.Runner;
+            
+            engine = Engine.create();
+            world = engine.world;
+            world.gravity.y = 0;
+            
+            // Get button dimensions and position
+            const neinBtn = document.getElementById('nein-btn');
+            const btnRect = neinBtn.getBoundingClientRect();
+            
+            // Create physics body for Nein button
+            neinBody = Bodies.rectangle(
+                btnRect.left + btnRect.width / 2,
+                btnRect.top + btnRect.height / 2,
+                btnRect.width,
+                btnRect.height,
+                {
+                    density: 0.001,
+                    friction: 0,
+                    frictionAir: 0.02,
+                    restitution: 0.8
+                }
+            );
+            
+            World.add(world, neinBody);
+            
+            // Create invisible walls with padding to keep button visible
+            const wallThickness = 50;
+            const padding = 80; // Keep button away from edges
+            const walls = [
+                // Top wall (with padding)
+                Bodies.rectangle(window.innerWidth / 2, padding - wallThickness / 2, window.innerWidth, wallThickness, { isStatic: true, restitution: 0.9 }),
+                // Bottom wall (with padding)
+                Bodies.rectangle(window.innerWidth / 2, window.innerHeight - padding + wallThickness / 2, window.innerWidth, wallThickness, { isStatic: true, restitution: 0.9 }),
+                // Left wall (with padding)
+                Bodies.rectangle(padding - wallThickness / 2, window.innerHeight / 2, wallThickness, window.innerHeight, { isStatic: true, restitution: 0.9 }),
+                // Right wall (with padding)
+                Bodies.rectangle(window.innerWidth - padding + wallThickness / 2, window.innerHeight / 2, wallThickness, window.innerHeight, { isStatic: true, restitution: 0.9 })
+            ];
+            
+            World.add(world, walls);
+            
+            // Activate physics positioning
+            neinBtn.classList.add('physics-active');
+            
+            // Start physics engine
+            runner = Runner.create();
+            Runner.run(runner, engine);
+            
+            appState.physicsActive = true;
+            
+            // Track mouse position
+            document.addEventListener('mousemove', handleMouseMove);
+            
+            // Start animation loop
+            animatePhysics();
+        }
+
+        function handleMouseMove(event) {
+            if (!appState.physicsActive) return;
+            
+            mousePosition.x = event.clientX;
+            mousePosition.y = event.clientY;
+            
+            // Check distance to Ja button for encouraging messages
+            const jaBtn = document.querySelector('.ja-btn');
+            if (jaBtn) {
+                const jaBtnRect = jaBtn.getBoundingClientRect();
+                const jaCenterX = jaBtnRect.left + jaBtnRect.width / 2;
+                const jaCenterY = jaBtnRect.top + jaBtnRect.height / 2;
+                const jaDistance = Math.sqrt(
+                    Math.pow(jaCenterX - mousePosition.x, 2) + 
+                    Math.pow(jaCenterY - mousePosition.y, 2)
+                );
+                
+                // Show/hide encouraging message instantly based on distance
+                if (jaDistance < 120) {
+                    // Show message if not already showing or if different message
+                    const now = Date.now();
+                    if (!jaMessageShowing || now - lastJaMessageTime > 2000) {
+                        const newMessage = jaMessages[Math.floor(Math.random() * jaMessages.length)];
+                        if (newMessage !== currentJaMessage || !jaMessageShowing) {
+                            showJaSpeechBubble(newMessage, jaCenterX, jaCenterY);
+                            currentJaMessage = newMessage;
+                            lastJaMessageTime = now;
+                        }
+                    }
+                } else {
+                    // Hide message immediately when cursor moves away
+                    if (jaMessageShowing) {
+                        hideJaSpeechBubble();
+                    }
+                }
+            }
+            
+            // Calculate distance to Nein button
+            const dx = neinBody.position.x - mousePosition.x;
+            const dy = neinBody.position.y - mousePosition.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            const neinBtn = document.getElementById('nein-btn');
+            const repulsionRadius = 150;
+            
+            if (distance < repulsionRadius && distance > 0) {
+                appState.neinAttempts++;
+                
+                // Update hint message
+                const hintMsg = document.getElementById('hint-message');
+                if (appState.neinAttempts >= 5) {
+                    hintMsg.textContent = hintMessages[Math.min(appState.neinAttempts, hintMessages.length - 1)];
+                    hintMsg.classList.add('show');
+                }
+                
+                // Show cheeky message
+                const now = Date.now();
+                if (now - lastMessageTime > 1500) {
+                    showSpeechBubble(cheekyMessages[Math.floor(Math.random() * cheekyMessages.length)]);
+                    lastMessageTime = now;
+                }
+                
+                // Shrinking effect based on distance
+                const scale = Math.max(0.6, distance / repulsionRadius);
+                appState.buttonScale = scale;
+                
+                // Panic mode - shake if cornered
+                const distanceToEdge = Math.min(
+                    neinBody.position.x,
+                    neinBody.position.y,
+                    window.innerWidth - neinBody.position.x,
+                    window.innerHeight - neinBody.position.y
+                );
+                
+                if (distanceToEdge < 100) {
+                    neinBtn.classList.add('shaking');
+                } else {
+                    neinBtn.classList.remove('shaking');
+                }
+                
+                // Speed increase with more attempts
+                const speedMultiplier = 1 + (appState.neinAttempts * 0.05);
+                const forceMagnitude = 0.001 * speedMultiplier * (repulsionRadius - distance) / distance;
+                
+                const forceX = dx * forceMagnitude;
+                const forceY = dy * forceMagnitude;
+                
+                Matter.Body.applyForce(neinBody, neinBody.position, {
+                    x: forceX,
+                    y: forceY
+                });
+            } else {
+                neinBtn.classList.remove('shaking');
+                appState.buttonScale = 1;
+            }
+        }
+
+        function showSpeechBubble(message) {
+            const bubble = document.getElementById('speech-bubble');
+            bubble.textContent = message;
+            bubble.style.left = neinBody.position.x + 'px';
+            bubble.style.top = (neinBody.position.y - 60) + 'px';
+            bubble.style.background = 'white';
+            bubble.style.color = '#FF1744';
+            bubble.classList.add('show');
+            
+            setTimeout(() => {
+                bubble.classList.remove('show');
+            }, 1000);
+        }
+
+        function showJaSpeechBubble(message, x, y) {
+            // Clear any existing timeout
+            if (jaBubbleTimeout) {
+                clearTimeout(jaBubbleTimeout);
+            }
+            
+            const bubble = document.getElementById('speech-bubble');
+            bubble.textContent = message;
+            bubble.style.left = x + 'px';
+            bubble.style.top = (y - 60) + 'px';
+            bubble.style.background = 'white';
+            bubble.style.color = '#00C853';
+            bubble.classList.add('show');
+            jaMessageShowing = true;
+        }
+
+        function hideJaSpeechBubble() {
+            const bubble = document.getElementById('speech-bubble');
+            bubble.classList.remove('show');
+            jaMessageShowing = false;
+            currentJaMessage = '';
+        }
+
+        function animatePhysics() {
+            if (!appState.physicsActive) return;
+            
+            // Keep button away from corners with gentle centering force
+            const padding = 100;
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            
+            // Check if button is too close to corners
+            const distToLeft = neinBody.position.x;
+            const distToRight = window.innerWidth - neinBody.position.x;
+            const distToTop = neinBody.position.y;
+            const distToBottom = window.innerHeight - neinBody.position.y;
+            
+            // Apply gentle centering force if too close to any edge
+            if (distToLeft < padding || distToRight < padding || distToTop < padding || distToBottom < padding) {
+                const toCenterX = centerX - neinBody.position.x;
+                const toCenterY = centerY - neinBody.position.y;
+                const distance = Math.sqrt(toCenterX * toCenterX + toCenterY * toCenterY);
+                
+                if (distance > 0) {
+                    const forceMagnitude = 0.00015;
+                    Matter.Body.applyForce(neinBody, neinBody.position, {
+                        x: (toCenterX / distance) * forceMagnitude,
+                        y: (toCenterY / distance) * forceMagnitude
+                    });
+                }
+            }
+            
+            // Sync HTML button position and scale with physics body
+            const neinBtn = document.getElementById('nein-btn');
+            neinBtn.style.left = (neinBody.position.x - neinBtn.offsetWidth / 2) + 'px';
+            neinBtn.style.top = (neinBody.position.y - neinBtn.offsetHeight / 2) + 'px';
+            neinBtn.style.transform = `scale(${appState.buttonScale})`;
+            
+            requestAnimationFrame(animatePhysics);
+        }
+
+        // Phase 3: Success with Enhanced Confetti
+        function acceptProposal() {
+            // Stop physics
+            appState.physicsActive = false;
+            if (runner) {
+                Matter.Runner.stop(runner);
+            }
+            
+            // Hide canvas
+            document.getElementById('physics-canvas').classList.remove('active');
+            
+            // Play success sound
+            if (!appState.audioMuted) {
+                const successSound = document.getElementById('success-sound');
+                successSound.play().catch(() => {});
+            }
+            
+            // Heart-shaped confetti explosion
+            const duration = 5000;
+            const animationEnd = Date.now() + duration;
+            
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+            
+            const interval = setInterval(function() {
+                const timeLeft = animationEnd - Date.now();
+                
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+                
+                const particleCount = 50 * (timeLeft / duration);
+                
+                // Heart confetti
+                confetti({
+                    particleCount,
+                    startVelocity: 30,
+                    spread: 360,
+                    ticks: 60,
+                    origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+                    colors: ['#FF1493', '#FF69B4', '#FFB6C1', '#FFC0CB', '#FF1744'],
+                    shapes: ['circle', 'square'],
+                    scalar: randomInRange(0.8, 1.2),
+                    zIndex: 9999
+                });
+                
+                confetti({
+                    particleCount,
+                    startVelocity: 30,
+                    spread: 360,
+                    ticks: 60,
+                    origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+                    colors: ['#FF1493', '#FF69B4', '#FFB6C1', '#FFC0CB', '#FF1744'],
+                    shapes: ['circle', 'square'],
+                    scalar: randomInRange(0.8, 1.2),
+                    zIndex: 9999
+                });
+            }, 250);
+            
+            // Transition to success phase
+            appState.currentPhase = 3;
+            document.getElementById('phase2').classList.remove('active');
+            document.getElementById('phase3').classList.add('active');
+            
+            // Show love letter after delay
+            setTimeout(() => {
+                document.getElementById('love-letter').classList.add('show');
+            }, 3000);
+        }
+
+        // Audio controls
+        function toggleAudio() {
+            appState.audioMuted = !appState.audioMuted;
+            const bgMusic = document.getElementById('bg-music');
+            const muteBtn = document.getElementById('mute-btn');
+            
+            if (appState.audioMuted) {
+                bgMusic.pause();
+                muteBtn.textContent = '🔇';
+            } else {
+                bgMusic.play().catch(() => {});
+                muteBtn.textContent = '🔊';
+            }
+        }
+
+        // Add to calendar
+        function addToCalendar() {
+            // This creates a simple calendar download
+            const event = {
+                title: 'Valentine\'s Date Night in Zurich',
+                location: '[RESTAURANT_NAME], Zurich',
+                description: 'Our special Valentine\'s dinner date',
+                start: '[DATE_TIME]', // Format: YYYY-MM-DDTHH:mm:ss
+                duration: 3 // hours
+            };
+            
+            alert('📅 Calendar feature: You can add this manually or integrate with your calendar app!');
+        }
+
+        // Initialize app
+        window.addEventListener('load', () => {
+            console.log('Valentine Experience Loaded! 💕');
+            createFloatingHearts();
+            startQuiz();
+            
+            // Setup audio controls
+            document.getElementById('mute-btn').addEventListener('click', toggleAudio);
+            
+            // Background music will start when Phase 2 begins (after quiz)
+        });
+    </script>
+</body>
+</html>
