@@ -1240,6 +1240,18 @@
             // Stop any ongoing interactions
             appState.currentPhase = 3;
             
+            // Hide all speech bubbles immediately
+            const bubble = document.getElementById('speech-bubble');
+            bubble.classList.remove('show');
+            bubble.style.opacity = '0';
+            
+            // Remove event listeners to prevent any more popups
+            document.removeEventListener('mousemove', handleMouseMoveForGif);
+            const neinBtn = document.getElementById('nein-btn');
+            if (neinBtn) {
+                neinBtn.removeEventListener('mouseenter', handleNeinHover);
+            }
+            
             // Play success sound
             if (!appState.audioMuted) {
                 const successSound = document.getElementById('success-sound');
